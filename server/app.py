@@ -3,29 +3,80 @@
 
 # 解决uft-8中文序列化报错的问题
 import sys
-import os
 reload(sys).setdefaultencoding("utf-8")
 
+import os
 sys.path.insert(0, os.path.realpath("%s/.." % os.path.dirname(os.path.abspath(__file__))))
 
 import tornado
-from tornado import websocket, web, ioloop
-from common import websocket_handler
+from tornado import websocket, ioloop, gen
+from tornado import web
+from tornado.options import define, options
+
+import traceback
+
+from common import tool, my_mongodb
+
+import config
 
 
-def main():
+@gen.coroutine
+def start_web(ws_handler, mongodbs):
 
-    settings = {
-        "debug": True,
-        "autoreload": True,
-    }
+    from routes import router
+    try:
 
-    web.Application([
-        (r"/ws", websocket_handler.DefaultWebsocketHandler),
-    ], **settings).listen(8888)
-    print "listen(8888)..."
+        define("port", default=config.SYSTEM["listening_port"], help="run on the given port", type=int)
+        options.parse_command_line()
+
+        router.add_get_url_handlers({
+            "/": "index.html",
+            "/login": "login.html",
+            "/account": "account.html",
+        })
+        router.add_post_url_handlers({
+            "/user_login": {},
+            "/user_logout": {},
+        })
+
+        settings = {
+            "debug": True,
+            # "autoreload": True,
+            "template_path": os.path.join(os.path.dirname(__file__), "static"),
+            # "static_path": os.path.join(os.path.dirname(__file__), "static"),
+        }
+
+        tornado.web.Application([
+            (r"/.*", router.DefaultRouterHandler),  # 默认处理方法，其他处理方法需在此方法之前声明
+            # (r".*", proxy.ProxyHandler),            # ProxyHandler
+        ], **settings).listen(options.port)
+
+    except Exception as e:
+        print traceback.format_exc()
+        raise
 
 
-if __name__ == "__main__":
-    main()
+@gen.coroutine
+def init():
+
+    try:
+        mongodbs = yield my_mongodb.init(config.MONGODB)
+
+        conf = {
+            "url": url,
+            "db_wechai": mongodbs["db_wechai"],
+        }
+        ws_handler = main.Main(conf)
+        yield ws_handler.connect()
+
+        yield start_web(ws_handler, mongodbs)
+
+    except Exception:
+        print traceback.format_exc()
+
+    # ioloop.IOLoop.instance().stop()
+
+
+if __name__ == '__main__':
+    init()
     ioloop.IOLoop.instance().start()

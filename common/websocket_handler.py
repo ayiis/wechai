@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import tornado
+from tornado import gen
 from common import tool
 # from db import api_ws_message_log
 import datetime
@@ -77,10 +78,11 @@ class DefaultWebsocketHandler(tornado.websocket.WebSocketHandler):
             except Exception:
                 print("Error sending message to ", waiter.request, ":\r\n", msg)
 
+    @gen.coroutine
     def send_message(self, status_code, msg):
         print("sending message to", self.request.remote_ip, ":\r\n", msg)
         try:
-            self.write_message({
+            yield self.write_message({
                 'code': status_code,
                 'detail': msg,
             })
@@ -98,6 +100,7 @@ class DefaultWebsocketHandler(tornado.websocket.WebSocketHandler):
         }
         # api_ws_message_log.insert_message(data)
 
+    @gen.coroutine
     def on_message(self, message):
         print("Incomming an message:\r\n", message)
         self.ts = datetime.datetime.now()
@@ -129,7 +132,7 @@ class DefaultWebsocketHandler(tornado.websocket.WebSocketHandler):
         handler = MESSAGE_TYPE.get(result['message_type'])
 
         try:
-            response = handler(result['message'])
+            response = yield handler(result['message'])
         except Exception:
             print('处理ws消息失败')
             self.error_msg = traceback.format_exc()

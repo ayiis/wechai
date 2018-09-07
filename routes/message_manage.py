@@ -19,3 +19,6 @@ class MessageManage(object):
 
     def on_group_message(self):
         pass
+
+    def on_error(self):
+        pass

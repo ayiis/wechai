@@ -25,3 +25,6 @@ class FriendManage(object):
 
     def on_break_relation(self):
         pass
+
+    def on_error(self):
+        pass

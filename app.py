@@ -5,33 +5,42 @@
 import sys
 reload(sys).setdefaultencoding("utf-8")
 
-import tornado
-from tornado import websocket, web, ioloop, gen
-# from websocket import websocket_connect
-# import tornado.websocket.websocket_connect
+# import tornado
+from tornado import websocket, ioloop, gen
+from tornado import web
 import traceback
 
-url = "ws://127.0.0.1:8888/ws"
+from common import tool, my_mongodb
+
+from routes import main
+import config
+from server import app as server_app
+
+# url = "ws://127.0.0.1:8888/ws"
+url = "ws://127.0.0.1:3000/"
 
 
 @gen.coroutine
-def main():
+def init():
 
     try:
-        conn = yield websocket.websocket_connect(url)
-        if True:
-            res = yield conn.write_message('123456')
-            print "res:", res
-            msg = yield conn.read_message()
-            # if msg is None:
-            #     break
-            print "msg:", msg
+        mongodbs = yield my_mongodb.init(config.MONGODB)
+
+        conf = {
+            "url": url,
+            "db_wechai": mongodbs["db_wechai"],
+        }
+        ws_handler = main.Main(conf)
+        yield ws_handler.connect()
+
+        yield server_app.start_web(ws_handler, mongodbs)
+
     except Exception:
         print traceback.format_exc()
 
-    ioloop.IOLoop.instance().stop()
+    # ioloop.IOLoop.instance().stop()
 
 
 if __name__ == '__main__':
-    main()
+    init()
     ioloop.IOLoop.instance().start()

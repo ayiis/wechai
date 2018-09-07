@@ -22,3 +22,6 @@ class GroupManage(object):
 
     def on_kickout(self):
         pass
+
+    def on_error(self):
+        pass
