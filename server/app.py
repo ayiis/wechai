@@ -19,6 +19,11 @@ from common import tool, my_mongodb
 
 import config
 
+from routes import (
+    message_manage,
+    contact_manage,
+)
+
 
 @gen.coroutine
 def start_web(ws_handler, mongodbs):
@@ -31,19 +36,25 @@ def start_web(ws_handler, mongodbs):
 
         router.add_get_url_handlers({
             "/": "index.html",
+            "/message_manage": "message_manage.html",
             "/login": "login.html",
             "/account": "account.html",
         })
         router.add_post_url_handlers({
             "/user_login": {},
             "/user_logout": {},
+
+            "/api/contact_list_query": contact_manage.contact_list_query,
+            "/api/message_list_query": message_manage.message_list_query,
         })
 
         settings = {
             "debug": True,
             # "autoreload": True,
+            "db_wechai": mongodbs["db_wechai"],
             "template_path": os.path.join(os.path.dirname(__file__), "static"),
-            # "static_path": os.path.join(os.path.dirname(__file__), "static"),
+            "static_path": os.path.join(os.path.dirname(__file__), "static"),
+            # "static_url_prefix": "",
         }
 
         tornado.web.Application([

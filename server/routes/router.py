@@ -3,6 +3,7 @@
 import tornado
 import tornado.gen
 import re, traceback
+import os
 
 from common import tool
 
@@ -57,9 +58,16 @@ class DefaultRouterHandler(tornado.web.RequestHandler):
             "error_msg": None,
         }
         if GET_URL_RULES.get(self.request.path, None) is None:
-            result["status"] = 404
-            result["render_page"] = "error.html"
-            result["error_msg"] = "404: You know what it means"
+            file_path = "%s/%s" % (self.settings["static_path"], self.request.path)
+            print "file_path:", file_path
+            if os.path.isfile(file_path):
+                result["status"] = 200
+                result["render_page"] = file_path
+                result["error_msg"] = ""
+            else:
+                result["status"] = 404
+                result["render_page"] = "error.html"
+                result["error_msg"] = "404: You know what it means"
         else:
             result["status"] = 200
             result["render_page"] = GET_URL_RULES[self.request.path]
@@ -96,9 +104,9 @@ class DefaultRouterHandler(tornado.web.RequestHandler):
             try:
                 # 获取url对应的处理方法
                 handler = POST_URL_RULES.get(self.request.path)
-                response = yield handler(self, request_data["body_json"])
+                response, count = yield handler(self, request_data["body_json"])
             except Exception, e:
                 print traceback.format_exc()
-                self.send_response(200, { "code": 500, "data": "", "desc": str(e) })
+                self.send_response(200, { "code": 500, "data": "", "count": 0, "desc": str(e) })
             else:
-                self.send_response(200, { "code": 200, "data": response, "desc": "success" })
+                self.send_response(200, { "code": 200, "data": response, "count": count, "desc": "success" })

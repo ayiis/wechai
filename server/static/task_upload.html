@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="favicon.ico">
+    <title>号码上传</title>
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/fileinput.min.css" rel="stylesheet">
+    <link href="css/tasks-upload.css" rel="stylesheet">
+    <!-- Custom styles for this template -->
+</head>
+
+<body>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="js/jquery.js"></script>
+    <script src="js/popper.js"></script>
+    <script src="js/bootstrap.js"></script>
+    <script src="js/fileinput.min.js"></script>
+    <script src="js/locales/zh.js"></script>
+
+    <div class="row upload-row">
+        <p>请选择上传的拨打号码文件, 请上传Excel格式的文件，文件格式为:</p>
+    </div>
+    <div class="row upload-row">
+        <img src="img/upload_sample.png" width="350" height="350"/>
+    </div>
+    <div class="row upload-row file-input-upload">
+        <input id="tasks" name="file_input" type="file" class="file"
+               data-show-preview="false" data-allowed-file-extensions='["xls","xlsx"]'>
+    </div>
+
+
+    <!-- Icons -->
+    <script src="js/feather.js"></script>
+    <script>
+        feather.replace();
+
+        $('#tasks').fileinput({
+            language: 'zh',
+            uploadUrl: '/upload/tasks',
+            uploadAsync:true
+        }).on("fileuploaded", function(event, data, previewId, index) {
+            alert("上传成功");
+        }).on('fileerror', function(event, data, msg) {
+            alert("上传失败");
+        });
+    </script>
+</body>
+
+</html>

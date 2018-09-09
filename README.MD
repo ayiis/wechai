@@ -25,6 +25,43 @@
     "date": msg.date(),
 }
 
+Wechai
+
+    -> contact [list, add, remove]
+        -> detail
+        -> message_list
+        -> message_send
+        -> message_recall x
+
+    -> room [list, create, leave, join, kickout]
+        -> detail
+        -> member_list ?
+        -> message_list
+        -> message_send
+        -> message_recall x
+
+
+/*
+# export to contact
+db.getCollection('any_message').aggregate([{
+    "$match": {"data.room": null, "data.from": {"$ne": null}}
+}, {
+    "$group": {
+        "_id": "$data.from",
+        "nick_name": {"$last": "$data.from_nick"}
+    }
+}, {
+    "$project": {
+        "_id": 0,
+        "wxid": "$_id",
+        "nick_name": "$nick_name",
+    }
+}, {
+    "$out": "contact"
+}])
+
+
+*/
 
 
 /*
