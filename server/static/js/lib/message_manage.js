@@ -19,7 +19,6 @@ window.message_manage = {
         $('#knowledge_ul').on('click', 'a', function(event){
             var group_id = $(this).closest('li').attr('group_id');
             var group_name = $(this).closest('li').text();
-            group_id = (group_id || parseInt(group_id) === 0) ? parseInt(group_id) : group_id;
             self.setting.group_id = group_id;
             self.setting.group_name = group_name;
             self.init_message_manage_list(self.setting.group_id, 1);
@@ -58,7 +57,7 @@ window.message_manage = {
         });
         $('#knowledgeScriptModal').on('show.bs.modal', function (event) {
             // var button = $(event.relatedTarget); // Button that triggered the modal
-            self.init_modal();
+            // self.init_modal();
         });
         $('#knowledgeScriptModal').on('hide.bs.modal', function (event) {
             $('#create_name').val(null);
@@ -138,16 +137,16 @@ window.message_manage = {
             contentType: 'application/json; charset=utf-8',
             dataType: 'json',
             success: function(json) {
-                if (!json.success) {
+                if (json.code !== 200) {
                     return common.bs_modal_message(json.message);
                 } else {
                     var li_html = [];
                     $.each(json.data, function(i, item){
                         li_html.push([
-                            '<li class="nav-item" group_id="' + item.group_id + '">',
+                            '<li class="nav-item" group_id="' + item.wxid + '">',
                                 '<a class="nav-link" href="#">',
                                     '<span data-feather="file-text"></span>',
-                                    item.group_name,
+                                    item.nick_name,
                                 '</a>',
                             '</li>'
                         ].join(''));
@@ -171,44 +170,33 @@ window.message_manage = {
             'answers': $('#input_answers').val() || '',
             'trigger': $('#input_trigger').val() || '',
 
-            'group_id': group_id,
+            'wxid': group_id,
             'page_index': page_index,
             'page_size': self.setting.page_size,
         }
         $.ajax({
             type: 'POST',
-            url: '/api/message_manage_list_query',
+            url: '/api/message_list_query',
             data: JSON.stringify(data),
             contentType: 'application/json; charset=utf-8',
             dataType: 'json',
             success: function(json) {
-                if (!json.success) {
+                if (json.code !== 200) {
                     return common.bs_modal_message(json.message);
                 } else {
                     var tr_html = [];
+
                     $.each(json.data, function(i, item){
                         tr_html.push([
                             '<tr dialogue_id="' + item.id + '">',
-                            '<td>', item.name, '</td>',
+                            '<td>', item.date, '</td>',
                             '<td>',
-                                '<span title="' + item.questions[0] + '">', item.questions[0] && item.questions[0].substr(0, 20), '</span>',
-                                '<br>',
-                                '<span title="' + item.questions[1] + '">', item.questions[1] && item.questions[1].substr(0, 20), '</span>',
+                                '<span title="' + item.text + '">', item.text && item.text.substr(0, 20), '</span>',
                             '</td>',
-                            '<td>',
-                                '<span title="' + item.answers[0] + '">', item.answers[0] && item.answers[0].substr(0, 20), '</span>',
-                                '<br>',
-                                '<span title="' + item.answers[1] + '">', item.answers[1] && item.answers[1].substr(0, 20), '</span>',
-                            '</td>',
-                            '<td>',
-                                item.trigger && item.trigger.scene_id,
-                                '<br>',
-                                item.trigger && item.trigger.actions && item.trigger.actions.join(", "),
-                            '</td>',
-                            '<td class="row btn-group">',
-                                '<a class="btn btn-sm btn-outline-primary mr-2" href="#" tag="edit">', '编辑', '</a>',
-                                '<a class="btn btn-sm btn-outline-danger mr-2" href="#" tag="delete">', '删除', '</a>',
-                            '</td>',
+                            // '<td class="row btn-group">',
+                            //     '<a class="btn btn-sm btn-outline-primary mr-2" href="#" tag="edit">', '编辑', '</a>',
+                            //     '<a class="btn btn-sm btn-outline-danger mr-2" href="#" tag="delete">', '删除', '</a>',
+                            // '</td>',
                             '</tr>',
                         ].join(''));
                     });

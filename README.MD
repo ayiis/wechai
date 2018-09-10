@@ -25,19 +25,20 @@
     "date": msg.date(),
 }
 
+
 Wechai
 
-    -> contact [list, add, remove]
-        -> detail
-        -> message_list
-        -> message_send
+    -> contact [list 1, add 0, remove 0]
+        -> detail 0
+        -> message_list 0
+        -> message_send 0
         -> message_recall x
 
-    -> room [list, create, leave, join, kickout]
-        -> detail
-        -> member_list ?
-        -> message_list
-        -> message_send
+    -> room [list 1, create 0, leave 0, join 0, kickout 0]
+        -> detail 0 [topic]
+        -> member_list 0
+        -> message_list 0
+        -> message_send 0
         -> message_recall x
 
 

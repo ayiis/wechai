@@ -40,23 +40,23 @@
 
                     <ul class="list-group">
                         <li class="list-group-item disabled">
-                            知识库管理
+                            好友管理
                             <ul class="list-group list-group-flush">
                                 <li class="list-group-item">
                                     <a class="nav-link" href="/message_manage.html">
                                         <span data-feather="file-text"></span>
-                                        知识库列表
+                                        好友列表
                                     </a>
                                 </li>
                             </ul>
                         </li>
                         <li class="list-group-item disabled">
-                            场景管理
+                            群管理
                             <ul class="list-group list-group-flush">
                                 <li class="list-group-item">
                                     <a class="nav-link" href="/scene_script.html">
                                         <span data-feather="file-text"></span>
-                                        场景列表
+                                        群列表
                                     </a>
                                 </li>
                             </ul>
@@ -69,10 +69,10 @@
                     <ul class="nav flex-column">
                         <li class="nav-item">
                             <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-                                <span class="h6">知识库列表</span>
+                                <span class="h6">好友列表</span>
                                 <a class="d-flex align-items-center btn btn-outline-primary" href="#" data-toggle="modal" data-target="#knowledgeModal">
                                     <span data-feather="plus-circle"></span>
-                                    <span>创建</span>
+                                    <span>添加</span>
                                 </a>
                             </h6>
                         </li>
@@ -84,7 +84,7 @@
             <main role="main" class="ml-sm-auto col-lg-8 px-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h6 class="h6">
-                        <span>知识库列表</span>
+                        <span>好友列表</span>
                         <span>&gt;&gt;</span>
                         <span id="group_name"></span>
                     </h6>
@@ -117,7 +117,7 @@
                     <div class="col-4">
                         <div class="input-group">
                             <button type="button" class="btn btn-primary mr-1" id="btn_search">搜 索</button>
-                            <button type="button" class="btn btn-success mr-1" id="btn_create" data-toggle="modal" data-target="#knowledgeScriptModal">创建话术</button>
+                            <button type="button" class="btn btn-success mr-1" id="btn_create" data-toggle="modal" data-target="#ContactModal">发送消息</button>
                         </div>
                     </div>
                 </div>
@@ -127,11 +127,11 @@
                         <table class="table table-striped table-sm" id="message_manage_table">
                             <thead>
                                 <tr>
-                                    <th>name</th>
-                                    <th>questions</th>
-                                    <th>answers</th>
+                                    <th>Date</th>
+                                    <th>Text</th>
+<!--                                     <th>answers</th>
                                     <th>trigger</th>
-                                    <th>操作</th>
+                                    <th>操作</th> -->
                                 </tr>
                             </thead>
                             <tbody>
@@ -165,11 +165,11 @@
         </div>
     </div>
 
-    <div class="modal fade" id="knowledgeModal" tabindex="-1" role="dialog" aria-labelledby="knowledgeModalLabel" aria-hidden="true">
+    <div class="modal fade" id="ContactModal" tabindex="-1" role="dialog" aria-labelledby="ContactModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="knowledgeModalLabel">创建知识库</h5>
+                    <h5 class="modal-title" id="ContactModalLabel">Send Message</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -178,7 +178,35 @@
                     <form>
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
-                                <span class="input-group-text">知识库名称:</span>
+                                <span class="input-group-text">message:</span>
+                            </div>
+                            <input type="text" class="form-control" aria-label="Sizing example input" id="contact_message_text">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" id="btn_send_message">提 交</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="knowledgeModal" tabindex="-1" role="dialog" aria-labelledby="knowledgeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="knowledgeModalLabel">添加好友</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">好友名称:</span>
                             </div>
                             <input type="text" class="form-control" aria-label="Sizing example input" id="create_group_name">
                         </div>
@@ -196,7 +224,7 @@
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="knowledgeScriptModalLabel">创建对话场景</h5>
+                    <h5 class="modal-title" id="knowledgeScriptModalLabel">添加对话群</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -205,7 +233,7 @@
                     <form>
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
-                                <span class="input-group-text">对话场景名称:</span>
+                                <span class="input-group-text">对话群名称:</span>
                             </div>
                             <input type="text" class="form-control" aria-label="Sizing example input" id="create_name">
                         </div>
@@ -225,7 +253,7 @@
                         </div>
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
-                                <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="create_scene">场景触发</button>
+                                <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="create_scene">群触发</button>
                                 <div class="dropdown-menu" id="create_scene_menu">
                                 </div>
                             </div>

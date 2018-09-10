@@ -10,20 +10,20 @@ from common import tool
 
 @tornado.gen.coroutine
 def message_list_query(self, req_data):
-    result = yield self.settings["db_wechai"].any_message.find({
-        # "test": 1
-    }).to_list(length=None)
+    # result = yield self.settings["db_wechai"].any_message.find({
+    #     # "test": 1
+    # }).to_list(length=None)
 
-    print "result:", result
+    # print "result:", result
 
-    assert req_data.get("contact_id") is not None, "contact_id cannot be empty"
+    assert req_data.get("wxid") is not None, "wxid cannot be empty"
 
     page_size = req_data.get("page_size") or 10
     page_index = req_data.get("page_index") or 1
     page_index = page_index - 1
 
     req_data = {
-        "contact_id": req_data["contact_id"]
+        "data.from": req_data["wxid"]
     }
 
     # for key in ["name", "trigger"]:
@@ -36,16 +36,20 @@ def message_list_query(self, req_data):
     #             "$regex": req_data[key],
     #         }
 
-    db_query = self.collection.find(
-        req_data,
-        {
-         "_id": 0
-        }
-    )
+    print "req_data:", req_data
 
-    sql_result = list(db_query.skip(page_size * page_index).limit(page_size))
-    result_count = db_query.count()
+    db_query = self.settings["db_wechai"].any_message.find(req_data)
+    print "db_query:", dir(db_query)
 
-    raise tornado.gen.Return(sql_result, result_count)
+    sql_result = yield db_query.skip(page_size * page_index).limit(page_size).to_list(length=None)
+    result_count = 20
+
+    # sql_result, result_count = yield [
+    #     db_query.skip(page_size * page_index).limit(page_size).to_list(length=None),
+    #     10
+    # ]
+    sql_result = [x["data"] for x in sql_result]
+
+    raise tornado.gen.Return((sql_result, result_count))
 
 
