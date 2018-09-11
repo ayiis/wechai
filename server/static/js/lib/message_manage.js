@@ -12,7 +12,6 @@ window.message_manage = {
         };
         self.init_knowledge_list();
         self.bind_event();
-        self.bind_input_event();
     },
     bind_event: function() {
         var self = this;
@@ -21,14 +20,14 @@ window.message_manage = {
             var group_name = $(this).closest('li').text();
             self.setting.group_id = group_id;
             self.setting.group_name = group_name;
-            self.init_message_manage_list(self.setting.group_id, 1);
             $('#knowledge_ul').find('a').removeClass('bg-white');
             $(this).addClass('bg-white');
+            self.init_contact_detail();
+            setInterval(function(){self.init_contact_detail();}, 3000);
             return false;
         });
         $('#pagination').on('click', 'a', function(event){
             var pageno = parseInt($(this).attr('pageno'));
-            self.init_message_manage_list(self.setting.group_id, pageno);
             return false;
         });
         $('#btn_upsert_knowledge').on('click', function(event){
@@ -71,7 +70,6 @@ window.message_manage = {
             $('#knowledgeScriptModal').attr('message_manage_id', null);
             common.clear_dynamic_div();
             $('.btn-outline-info[tag="record_input"]').hide();
-            message_manage.bind_input_event();
         });
         $('#message_manage_table>tbody').on('click', 'a[tag="delete"]', function(event){
             var id = $(this).closest("tr").attr("dialogue_id");
@@ -92,42 +90,12 @@ window.message_manage = {
             self.upsert_message_manage();
             return false;
         });
-    },
-
-    bind_input_event: function() {
-
-        var message_manage_id = $('#knowledgeScriptModal').attr('message_manage_id');
-        var hasRecord = true;
-        if (!message_manage_id) {
-            hasRecord = false;
-        }
-        $('.btn[tag="add_input"]').off('click').on('click',  function(){
-            common.add_record_input($(this).parent(), "create_answer", "", hasRecord);
-            message_manage.bind_input_event(); //重新绑定事件
-        });
-
-        $('.btn[tag="remove_input"]').off('click').on('click',  function(){
-            $(this).parent().remove();
-        });
-
-        $('.btn[tag="record_input"]').off('click').on('click',  function(){
-            var content = $(this).parent().find("input").val();
-            content = $.trim(content);
-            if(content === "") {
-                common.bs_modal_message('请输入内容后再进行录音');
-                return;
+        $('#msgbox').on('keydown', function(event){
+            if (event.ctrlKey && event.keyCode == 13)  {
+                self.send_message();
             }
-            //录音文件的key使用MD5加密录音内容生成
-            var key = $('#knowledgeScriptModal').attr('message_manage_id') + "_" + md5(content);
-            content = encodeURIComponent(content);
-            var url = common.record_page_url + '?content=' + content + '&key=' + key;
-            //$("#record_page").attr('src', url);  //iframe方式无法获取麦克风权限
-            //$("#recordModal").modal('show');
-            window.open(url, 'record_window');
         });
-
     },
-
     init_knowledge_list: function() {
         var self = this;
         $.ajax({
@@ -161,18 +129,41 @@ window.message_manage = {
 
         });
     },
-    init_message_manage_list: function(group_id, page_index) {
+    send_message: function() {
         var self = this;
         var data = {
+            'type': "message",
+            'to_id': self.setting.group_id,
+            'text': $('#msgbox').val(),
+        }
+        $('#msgbox').val(null);
 
-            'name': $('#input_name').val() || '',
-            'questions': $('#input_questions').val() || '',
-            'answers': $('#input_answers').val() || '',
-            'trigger': $('#input_trigger').val() || '',
-
-            'wxid': group_id,
-            'page_index': page_index,
-            'page_size': self.setting.page_size,
+        $.ajax({
+            type: 'POST',
+            url: '/api/send_any_message',
+            data: JSON.stringify(data),
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function(json) {
+                if (json.code !== 200) {
+                    return common.bs_modal_message(json.message);
+                } else {
+                    // common.bs_modal_message('发送成功');
+                    // self.init_contact_detail();
+                }
+            },
+            error: function(error) {
+                return common.bs_modal_message(error);
+            },
+        });
+    },
+    init_contact_detail: function() {
+        var self = this;
+        if(!self.setting.group_id){
+            return;
+        }
+        var data = {
+            'wxid': self.setting.group_id,
         }
         $.ajax({
             type: 'POST',
@@ -184,255 +175,19 @@ window.message_manage = {
                 if (json.code !== 200) {
                     return common.bs_modal_message(json.message);
                 } else {
-                    var tr_html = [];
-
-                    $.each(json.data, function(i, item){
-                        tr_html.push([
-                            '<tr dialogue_id="' + item.id + '">',
-                            '<td>', item.date, '</td>',
-                            '<td>',
-                                '<span title="' + item.text + '">', item.text && item.text.substr(0, 20), '</span>',
-                            '</td>',
-                            // '<td class="row btn-group">',
-                            //     '<a class="btn btn-sm btn-outline-primary mr-2" href="#" tag="edit">', '编辑', '</a>',
-                            //     '<a class="btn btn-sm btn-outline-danger mr-2" href="#" tag="delete">', '删除', '</a>',
-                            // '</td>',
-                            '</tr>',
-                        ].join(''));
+                    var html = [];
+                    $.each(json.data, function(i, item) {
+                        var li = [
+                        '<li>',
+                            '<p class="time"> <span>', item.date ,'</span> </p>',
+                            '<div class="main ', item.self && 'self' ,'"> <img class="avatar" width="30" height="30" src="/static/img/2.png">',
+                                '<div class="text">', item.text ,'</div>',
+                            '</div>',
+                        '</li>',
+                        ];
+                        html.unshift(li.join(""));
                     });
-                    $('#group_name').text(self.setting.group_name);
-                    $('#message_manage_table>tbody').empty().append(tr_html.join('\r\n'));
-                    self.setting.page_index = page_index;
-                    self.setting.count = json.count;
-                    common.touch_pagination(self.setting.page_index, self.setting.page_size, self.setting.count);
-                }
-            },
-            error: function(error) {
-                return common.bs_modal_message(error);
-            },
-
-        });
-    },
-    message_manage_delete: function(id) {
-        var self = this;
-        var data = {
-            'id': parseInt(id),
-        }
-        if (!data['id'] && data['id'] !== 0) data['id'] = id;   // compatible with old data
-
-        $.ajax({
-            type: 'POST',
-            url: '/api/message_manage_delete',
-            data: JSON.stringify(data),
-            contentType: 'application/json; charset=utf-8',
-            dataType: 'json',
-            success: function(json) {
-                if (!json.success) {
-                    return common.bs_modal_message(json.message);
-                } else {
-                    common.bs_modal_message('删除成功，删除1条内容');
-                    self.init_message_manage_list(self.setting.group_id, self.setting.page_index);
-                }
-            },
-            error: function(error) {
-                return common.bs_modal_message(error);
-            },
-
-        });
-    },
-    init_modal: function() {
-        var self = this;
-        $.ajax({
-            type: 'POST',
-            url: '/api/scene_list_query',
-            data: '{}',
-            contentType: 'application/json; charset=utf-8',
-            dataType: 'json',
-            success: function(json) {
-                if (!json.success) {
-                    return common.bs_modal_message(json.message);
-                } else {
-                    var div_html = [];
-                    $.each(json.data, function(i, item){
-                        div_html.push([
-                            '<a class="dropdown-item" href="#" scene_id="', item.scene_id, '">', item.scene_name, '</a>'
-                        ].join(''))
-                    });
-                    $('#create_scene_menu').empty().append(div_html.join(''));
-                    var scene_id = $('#create_scene_menu').attr('scene_id');
-                    $('#create_scene_menu').find('a[scene_id="' + scene_id + '"]').click();
-                }
-            },
-            error: function(error) {
-                return common.bs_modal_message(error);
-            },
-
-        });
-    },
-    build_modal: function(id) {
-        var self = this;
-        var data = {
-            'id': parseInt(id),
-        }
-
-        if (!data['id'] && data['id'] !== 0) data['id'] = id;   // compatible with old data
-
-        $.ajax({
-            type: 'POST',
-            url: '/api/message_manage_detail',
-            data: JSON.stringify(data),
-            contentType: 'application/json; charset=utf-8',
-            dataType: 'json',
-            success: function(json) {
-                if (!json.success) {
-                    return common.bs_modal_message(json.message);
-                } else {
-                    $('.btn-outline-info[tag="record_input"]').show();
-                    $('#create_name').val(json.data.name);
-                    $('#create_questions').val(json.data.questions.join('\n'));
-                    //$('#create_answers').val(json.data.answers.join('\n'));
-                    if(json.data.answers.length > 0) {
-                        $('#create_answers').val(json.data.answers[0]);
-                        for(var i=json.data.answers.length-1;i>0;i--) {  //倒叙插入
-                            common.add_record_input($('#create_answers').parent(), 'create_answers', json.data.answers[i], true);
-                        }
-                    }
-                    if (json.data.trigger) {
-                        $('#create_scene_menu').attr('scene_id', json.data.trigger.scene_id);
-                        $('#create_scene').attr('scene_id', json.data.trigger.scene_id);
-                        $('#create_trigger').val(json.data.trigger.actions.join('\n'));
-                    }
-                    $('#knowledgeScriptModal').modal('show');
-                    $('#knowledgeScriptModal').attr('message_manage_id', json.data.id);
-                    self.bind_input_event();
-                }
-            },
-            error: function(error) {
-                return common.bs_modal_message(error);
-            },
-
-        });
-    },
-    upsert_message_manage: function() {
-        var self = this;
-        var answers = [];
-        $('.ai-input').each(function(){
-            if($.trim($(this).val()) != '') {
-                answers.push($.trim($(this).val()));
-            }
-        });
-        var data = {
-            'name': $('#create_name').val() || '',
-            'questions': $('#create_questions').val() && $('#create_questions').val().split('\n') || '',
-            'answers': answers || '',
-            'group_id': parseInt(self.setting.group_id),
-        }
-        var actions = $('#create_trigger').val();
-        var scene_id = $('#create_scene').attr('scene_id');
-        if (actions && scene_id) {
-            data.trigger = {
-                'scene_id': $('#create_scene').attr('scene_id'),
-                'actions': actions.split('\n'),
-            }
-        } else if (actions || scene_id) {
-            return common.bs_modal_message('场景触发未填写完整');
-        }
-
-        var url = '/api/message_manage_create';
-        var message_manage_id = $('#knowledgeScriptModal').attr('message_manage_id');
-        if (message_manage_id) {
-            url = '/api/message_manage_update';
-            data['id'] = parseInt(message_manage_id)
-            data['id'] = (data['id'] || data['id'] === 0) ? data['id'] : message_manage_id;
-        }
-
-        $.ajax({
-            type: 'POST',
-            url: url,
-            data: JSON.stringify(data),
-            contentType: 'application/json; charset=utf-8',
-            dataType: 'json',
-            success: function(json) {
-                if (!json.success) {
-                    return common.bs_modal_message(json.message);
-                } else {
-                    if (message_manage_id || message_manage_id === 0 ){
-                        common.bs_modal_message('修改成功');
-                    } else {
-                        common.bs_modal_message('创建成功');
-                    }
-                    $('#knowledgeScriptModal').modal('hide');
-                    self.init_message_manage_list(self.setting.group_id, self.setting.page_index);
-                }
-            },
-            error: function(error) {
-                return common.bs_modal_message(error);
-            },
-
-        });
-    },
-    upsert_knowledge: function() {
-        var self = this;
-        var data = {
-            'group_name': $('#create_group_name').val() || '',
-        }
-        if(!data['group_name']) {
-            return common.bs_modal_message('知识库名称未填写');
-        }
-
-        var url = '/api/knowledge_create';
-        var group_id = $('#knowledgeModal').attr('group_id');
-        if (!!group_id) {
-            url = '/api/knowledge_update';
-            data['group_id'] = parseInt(group_id)
-            data['group_id'] = (data['group_id'] || data['group_id'] === 0) ? data['group_id'] : group_id;
-        }
-
-        $.ajax({
-            type: 'POST',
-            url: url,
-            data: JSON.stringify(data),
-            contentType: 'application/json; charset=utf-8',
-            dataType: 'json',
-            success: function(json) {
-                if (!json.success) {
-                    return common.bs_modal_message(json.message);
-                } else {
-                    if (group_id || group_id === 0 ){
-                        common.bs_modal_message('修改成功');
-                    } else {
-                        common.bs_modal_message('创建成功');
-                    }
-                    $('#knowledgeModal').modal('hide');
-                    self.init_knowledge_list();
-                }
-            },
-            error: function(error) {
-                return common.bs_modal_message(error);
-            },
-
-        });
-    },
-    knowledge_delete: function(group_id) {
-        var self = this;
-        var data = {
-            'group_id': parseInt(group_id),
-        }
-        if (!data['group_id'] && data['group_id'] !== 0) data['group_id'] = group_id;   // compatible with old data
-
-        $.ajax({
-            type: 'POST',
-            url: '/api/knowledge_delete',
-            data: JSON.stringify(data),
-            contentType: 'application/json; charset=utf-8',
-            dataType: 'json',
-            success: function(json) {
-                if (!json.success) {
-                    return common.bs_modal_message(json.message);
-                } else {
-                    common.bs_modal_message('删除成功，删除' + json['count'] + '条内容', null, function(){
-                        window.location.reload();
-                    });
+                    $('#chatroom ul').empty().append(html.join(""));
                 }
             },
             error: function(error) {

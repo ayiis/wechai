@@ -9,9 +9,10 @@
     <link rel="icon" href="favicon.ico">
     <title>WechaI</title>
     <!-- Bootstrap core CSS -->
-    <link href="static/css/bootstrap.css" rel="stylesheet">
+    <link href="/static/css/bootstrap.css" rel="stylesheet">
     <!-- Custom styles for this template -->
-    <link href="static/css/dashboard.css" rel="stylesheet">
+    <link href="/static/css/dashboard.css" rel="stylesheet">
+    <link href="/static/css/chatroom.css" rel="stylesheet">
 </head>
 
 <body>
@@ -90,77 +91,39 @@
                     </h6>
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <div class="btn-group mr-2">
-                            <button class="btn btn-sm btn-outline-primary" id="btn_edit_knowledge">编辑</button>
+                            <button class="btn btn-sm btn-outline-primary" id="btn_edit_knowledge">详情</button>
                         </div>
                         <div class="btn-group mr-2">
                             <button class="btn btn-sm btn-outline-danger" id="btn_remove_knowledge">删除</button>
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-8">
-                        <div class="input-group">
-                            <div class="col">
-                                <input type="text" class="form-control" placeholder="name" id="input_name">
-                            </div>
-                            <div class="col">
-                                <input type="text" class="form-control" placeholder="questions" id="input_questions">
-                            </div>
-                            <div class="col">
-                                <input type="text" class="form-control" placeholder="answers" id="input_answers">
-                            </div>
-                            <!-- <div class="col">
-                                <input type="text" class="form-control" placeholder="trigger" id="input_trigger">
-                            </div> -->
-                        </div>
-                    </div>
-                    <div class="col-4">
-                        <div class="input-group">
-                            <button type="button" class="btn btn-primary mr-1" id="btn_search">搜 索</button>
-                            <button type="button" class="btn btn-success mr-1" id="btn_create" data-toggle="modal" data-target="#ContactModal">发送消息</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="row"><hr></div>
-                <div class="row">
-                    <div class="table-responsive">
-                        <table class="table table-striped table-sm" id="message_manage_table">
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Text</th>
-<!--                                     <th>answers</th>
-                                    <th>trigger</th>
-                                    <th>操作</th> -->
-                                </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div id="pagination">
-                        <nav aria-label="Page navigation example">
-                            <ul class="pagination">
-                                <li class="page-item disabled">
-                                    <a class="page-link" href="#" aria-label="Previous" tag="pf">
-                                        <span aria-hidden="true">&laquo;</span>
-                                        <span class="sr-only">First</span>
-                                    </a>
-                                </li>
-                                <li class="page-item disabled"><a class="page-link" href="#" tag="pg1">1</a></li>
-                                <li class="page-item disabled"><a class="page-link" href="#" tag="pg2">2</a></li>
-                                <li class="page-item disabled"><a class="page-link" href="#" tag="pg3">3</a></li>
-                                <li class="page-item disabled">
-                                    <a class="page-link" href="#" aria-label="Next" tag="pl">
-                                        <span aria-hidden="true">&raquo;</span>
-                                        <span class="sr-only">Last</span>
-                                    </a>
-                                </li>
-                                <!-- <li class="page-item"><span>Total: 4</span></li> -->
+                <div class="row" id="chatroom">
+                    <div class="main sendbox">
+                        <div class="message">
+                            <ul>
+                                <!-- <li>
+                                    <p class="time"> <span>14:28</span> </p>
+                                    <div class="main self"> <img class="avatar" width="30" height="30" src="/static/img/1.jpg">
+                                        <div class="text">asfas</div>
+                                    </div>
+                                </li> -->
                             </ul>
-                        </nav>
+                        </div>
+                        <div class="text sendbox">
+                            <textarea placeholder="按 Ctrl + Enter 发送" id="msgbox"></textarea>
+                        </div>
+<!--                         <div class="btn-toolbar mb-2 mb-md-0">
+                            <div class="btn-group mr-2">
+                                <button class="btn btn-sm btn-outline-primary" id="btn_edit_knowledge">详情</button>
+                            </div>
+                            <div class="btn-group mr-2">
+                                <button class="btn btn-sm btn-outline-danger" id="btn_remove_knowledge">删除</button>
+                            </div>
+                        </div> -->
                     </div>
                 </div>
+
             </main>
         </div>
     </div>
@@ -271,19 +234,19 @@
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="js/jquery.js"></script>
-    <script src="js/popper.js"></script>
-    <script src="js/bootstrap.js"></script>
-    <script src="js/md5.min.js"></script>
+    <script src="/static/js/jquery.js"></script>
+    <script src="/static/js/popper.js"></script>
+    <script src="/static/js/bootstrap.js"></script>
+    <script src="/static/js/md5.min.js"></script>
 
     <!-- Icons -->
-    <script src="js/feather.js"></script>
+    <script src="/static/js/feather.js"></script>
     <script>
         feather.replace();
     </script>
 
-    <script src="js/common.js"></script>
-    <script src="js/lib/message_manage.js"></script>
+    <script src="/static/js/common.js"></script>
+    <script src="/static/js/lib/message_manage.js"></script>
     <script type="text/javascript">
         message_manage.init();
     </script>

@@ -1,0 +1,66 @@
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>vue-chat</title>
+    <link href="/static/css/chatroom.css" rel="stylesheet">
+</head>
+
+<body>
+    <div id="chatroom">
+        <div class="sidebar">
+            <div class="card">
+                <header> <img class="avatar" width="40" height="40" alt="coffce" src="/static/img/1.jpg">
+                    <p class="name">coffce</p>
+                </header>
+                <footer>
+                    <input class="search" type="text" placeholder="search user..."> </footer>
+            </div>
+            <div class="list">
+                <ul>
+                    <li class="active"> <img class="avatar" width="30" height="30" alt="示例介绍" src="/static/img/2.png">
+                        <p class="name">示例介绍</p>
+                    </li>
+                    <li> <img class="avatar" width="30" height="30" alt="webpack" src="/static/img/3.jpg">
+                        <p class="name">webpack</p>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="main sendbox">
+            <div class="message">
+                <ul>
+                    <li>
+                        <p class="time"> <span>14:28</span> </p>
+                        <div class="main"> <img class="avatar" width="30" height="30" src="/static/img/2.png">
+                            <div class="text">Hello，这是一个基于Vue + Vuex + Webpack构建的简单chat示例，聊天记录保存在localStorge, 有什么问题可以通过Github Issue问我。</div>
+                        </div>
+                    </li>
+                    <li>
+                        <p class="time"> <span>14:28</span> </p>
+                        <div class="main"> <img class="avatar" width="30" height="30" src="/static/img/2.png">
+                            <div class="text">项目地址: https://github.com/coffcer/vue-chat</div>
+                        </div>
+                    </li>
+                    <li>
+                        <p class="time"> <span>14:28</span> </p>
+                        <div class="main self"> <img class="avatar" width="30" height="30" src="/static/img/1.jpg">
+                            <div class="text">asfas</div>
+                        </div>
+                    </li>
+                    <li>
+                        <p class="time"> <span>14:29</span> </p>
+                        <div class="main self"> <img class="avatar" width="30" height="30" src="/static/img/1.jpg">
+                            <div class="text">whoami</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="text sendbox">
+                <textarea placeholder="按 Ctrl + Enter 发送"></textarea>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

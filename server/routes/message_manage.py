@@ -23,7 +23,12 @@ def message_list_query(self, req_data):
     page_index = page_index - 1
 
     req_data = {
-        "data.from": req_data["wxid"]
+        "$or": [{
+            "data.from": req_data["wxid"]
+        }, {
+            "data.to": req_data["wxid"],
+        }],
+        "data.room": None,
     }
 
     # for key in ["name", "trigger"]:
@@ -41,7 +46,7 @@ def message_list_query(self, req_data):
     db_query = self.settings["db_wechai"].any_message.find(req_data)
     print "db_query:", dir(db_query)
 
-    sql_result = yield db_query.skip(page_size * page_index).limit(page_size).to_list(length=None)
+    sql_result = yield db_query.sort([("bg-ts", -1)]).skip(page_size * page_index).limit(page_size).to_list(length=None)
     result_count = 20
 
     # sql_result, result_count = yield [

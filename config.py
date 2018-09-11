@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 SYSTEM = {
-    "listening_port": 80,
+    "listening_port": 8081,
 }
 
 MONGODB = {
@@ -13,4 +13,8 @@ MONGODB = {
         "USERNAME": "",
         "PASSWORD": "",
     },
+}
+
+API = {
+    "send_any_message": "http://127.0.0.1:8081/api/send_any_message"
 }

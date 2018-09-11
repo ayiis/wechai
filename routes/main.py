@@ -97,6 +97,9 @@ class Main(object):
         except Exception as e:
             print traceback.format_exc()
 
+    def write_message(self, message):
+        return self.conf["ws_conn"].write_message(tool.json_stringify(message))
+
     @gen.coroutine
     def on_connection_close(self, message):
         """TODO"""
