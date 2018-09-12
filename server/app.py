@@ -22,6 +22,7 @@ import config
 from routes import (
     message_manage,
     contact_manage,
+    room_manage,
     send_any_message,
 )
 
@@ -47,6 +48,9 @@ def start_web(ws_handler, mongodbs):
 
             "/api/contact_list_query": contact_manage.contact_list_query,
             "/api/message_list_query": message_manage.message_list_query,
+
+            "/api/room_list_query": room_manage.room_list_query,
+            "/api/room_message_list_query": room_manage.room_message_list_query,
 
             "/api/send_any_message": send_any_message.do,
         })

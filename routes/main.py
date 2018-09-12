@@ -73,6 +73,8 @@ class Main(object):
                 except Exception as e:
                     print traceback.format_exc()
 
+                return  # do nothing (two ai will dead lock this produring message)
+
                 try:
                     if json_message["data"].get("self") is False:
                         message_type = json_message["data"].get("room") and "room-message" or "message"

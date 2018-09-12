@@ -41,11 +41,7 @@ def message_list_query(self, req_data):
     #             "$regex": req_data[key],
     #         }
 
-    print "req_data:", req_data
-
     db_query = self.settings["db_wechai"].any_message.find(req_data)
-    print "db_query:", dir(db_query)
-
     sql_result = yield db_query.sort([("bg-ts", -1)]).skip(page_size * page_index).limit(page_size).to_list(length=None)
     result_count = 20
 

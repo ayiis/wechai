@@ -28,7 +28,7 @@
 
 Wechai
 
-    -> contact [list 1, add 0, remove 0]
+    -> contact [list 1, add 0, auto_add 1, remove 0]
         -> detail 0
         -> message_list 1
         -> message_send 1
@@ -37,8 +37,8 @@ Wechai
     -> room [list 1, create 0, leave 0, join 0, kickout 0]
         -> detail 0 [topic]
         -> member_list 0
-        -> message_list 0
-        -> message_send 0
+        -> message_list 1
+        -> message_send 1
         -> message_recall x
 
 
