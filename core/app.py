@@ -15,7 +15,6 @@ from common import tool, my_mongodb
 from routes import main
 from routes.api import recv_any_message
 import config
-from server import app as server_app
 
 # url = "ws://127.0.0.1:8888/ws"
 url = "ws://127.0.0.1:3000/"
@@ -46,8 +45,29 @@ def start_web(ws_handler, mongodbs):
         raise
 
 
+from routes import ws_handler
+
+
 @gen.coroutine
 def init():
+
+    mongodbs = yield my_mongodb.init(config.MONGODB)
+
+    settings = {
+        "debug": True,
+        "autoreload": True,
+        "db_wechai": mongodbs["db_wechai"],
+    }
+
+    tornado.web.Application([
+        (r"/concat", ws_handler.WsHandler),
+    ], **settings).listen(config.SYSTEM["listening_port"])
+
+    print "ws Listen:", config.SYSTEM["listening_port"]
+
+
+@gen.coroutine
+def init0():
 
     try:
         mongodbs = yield my_mongodb.init(config.MONGODB)
@@ -58,10 +78,6 @@ def init():
         }
         ws_handler = main.Main(conf)
         yield ws_handler.connect()
-
-        yield start_web(ws_handler, mongodbs)
-
-        yield server_app.start_web(ws_handler, mongodbs)
 
     except Exception:
         print traceback.format_exc()

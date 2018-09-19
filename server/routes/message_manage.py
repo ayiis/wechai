@@ -43,7 +43,7 @@ def message_list_query(self, req_data):
 
     db_query = self.settings["db_wechai"].any_message.find(req_data)
     sql_result = yield db_query.sort([("bg-ts", -1)]).skip(page_size * page_index).limit(page_size).to_list(length=None)
-    result_count = 20
+    result_count = 10
 
     # sql_result, result_count = yield [
     #     db_query.skip(page_size * page_index).limit(page_size).to_list(length=None),

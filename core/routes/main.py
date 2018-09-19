@@ -13,6 +13,7 @@ from routes import (
     message_manage,
 )
 
+
 class Main(object):
     """docstring for Main"""
     def __init__(self, conf):
@@ -39,6 +40,17 @@ class Main(object):
                 break
             yield gen.sleep(1.0)
 
+    # @gen.coroutine
+    # def listen(self):
+    #     try:
+    #         self.conf["ws_conn"] = yield websocket.websocket_connect(self.conf["url"])
+    #     except Exception as e:
+    #         print datetime.datetime.now(), "websocket_connect Failed:", e
+    #     else:
+    #         print "connect success..."
+    #         self.conf["ws_conn"].on_message = self.on_message
+    #         self.conf["ws_conn"].on_connection_close = self.on_connection_close
+
     def on_any_request(self):
         pass
 
@@ -59,7 +71,7 @@ class Main(object):
                 try:
                     json_message = tool.json_load(message)
                     assert isinstance(json_message.get("data"), dict)
-                except Exception as e:
+                except Exception:
                     json_message = {
                         "errno": 2,
                         "type": "message",
@@ -70,7 +82,7 @@ class Main(object):
 
                 try:
                     yield self.conf["db_wechai"]["any_message"].insert_one(json_message)
-                except Exception as e:
+                except Exception:
                     print traceback.format_exc()
 
                 return  # do nothing (two ai will dead lock this produring message)
@@ -92,11 +104,10 @@ class Main(object):
                         }
                         print "res_message:", res_message
                         self.conf["ws_conn"].write_message(tool.json_stringify(res_message))
-                except Exception as e:
+                except Exception:
                     print traceback.format_exc()
 
-
-        except Exception as e:
+        except Exception:
             print traceback.format_exc()
 
     def write_message(self, message):

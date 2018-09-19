@@ -7,7 +7,7 @@ import os
 
 from common import tool
 
-POST_URL_RULES = {None: lambda error_msg: error_msg }
+POST_URL_RULES = {None: lambda error_msg: error_msg}
 GET_URL_RULES = {}
 
 
@@ -37,7 +37,7 @@ class DefaultRouterHandler(tornado.web.RequestHandler):
         else:
             try:
                 result["body_json"] = tool.json_load(self.request.body)
-            except:
+            except Exception:
                 result["status"] = 400
                 result["error_msg"] = "Request body Must be in `JSON` format"
                 return result
@@ -48,7 +48,6 @@ class DefaultRouterHandler(tornado.web.RequestHandler):
             result["error_msg"] = POST_URL_RULES[None]("404: You know what it means")
 
         return result
-
 
     # 验证请求的格式，内容
     def validate_get_request(self):
@@ -75,13 +74,11 @@ class DefaultRouterHandler(tornado.web.RequestHandler):
 
         return result
 
-
     # POST 返回内容
     def send_response(self, status_code, data):
         self.set_status(status_code)
         self.set_header("Content-Type", "application/json; charset=UTF-8")
         self.finish(tool.json_stringify(data))
-
 
     def get(self, *args, **kwargs):
         request_data = self.validate_get_request()
@@ -94,7 +91,6 @@ class DefaultRouterHandler(tornado.web.RequestHandler):
             self.set_status(500)
             self.render("error.html", error=str(e))
 
-
     @tornado.gen.coroutine
     def post(self, *args, **kwargs):
         request_data = self.validate_post_request()
@@ -105,8 +101,8 @@ class DefaultRouterHandler(tornado.web.RequestHandler):
                 # 获取url对应的处理方法
                 handler = POST_URL_RULES.get(self.request.path)
                 response, count = yield handler(self, request_data["body_json"])
-            except Exception, e:
+            except Exception as e:
                 print traceback.format_exc()
-                self.send_response(200, { "code": 500, "data": "", "count": 0, "desc": str(e) })
+                self.send_response(200, {"code": 500, "data": "", "count": 0, "desc": str(e)})
             else:
-                self.send_response(200, { "code": 200, "data": response, "count": count, "desc": "success" })
+                self.send_response(200, {"code": 200, "data": response, "count": count, "desc": "success"})

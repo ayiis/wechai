@@ -3,6 +3,8 @@
 
 SYSTEM = {
     "listening_port": 8081,
+    "ws_for_wechaty_port": 8181,
+    "ws_for_server_port": 8182,
 }
 
 MONGODB = {
