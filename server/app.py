@@ -28,7 +28,7 @@ from routes import (
 
 
 @gen.coroutine
-def start_web(ws_handler, mongodbs):
+def init():
 
     from routes import router
     try:
@@ -47,13 +47,14 @@ def start_web(ws_handler, mongodbs):
             "/user_logout": {},
 
             "/api/contact_list_query": contact_manage.contact_list_query,
-            "/api/message_list_query": message_manage.message_list_query,
+            # "/api/concat_message_list_query": message_manage.message_list_query,
 
             "/api/room_list_query": room_manage.room_list_query,
-            "/api/room_message_list_query": room_manage.room_message_list_query,
+            # "/api/room_message_list_query": room_manage.room_message_list_query,
 
             "/api/send_any_message": send_any_message.do,
         })
+        mongodbs = {"db_wechai": None}
 
         settings = {
             "debug": True,
@@ -69,32 +70,13 @@ def start_web(ws_handler, mongodbs):
             # (r".*", proxy.ProxyHandler),            # ProxyHandler
         ], **settings).listen(options.port)
 
-    except Exception as e:
+        print "Listening:", options.port
+
+    except Exception:
         print traceback.format_exc()
         raise
 
 
-@gen.coroutine
-def init():
-
-    try:
-        mongodbs = yield my_mongodb.init(config.MONGODB)
-
-        conf = {
-            "url": url,
-            "db_wechai": mongodbs["db_wechai"],
-        }
-        ws_handler = main.Main(conf)
-        yield ws_handler.connect()
-
-        yield start_web(ws_handler, mongodbs)
-
-    except Exception:
-        print traceback.format_exc()
-
-    # ioloop.IOLoop.instance().stop()
-
-
 if __name__ == '__main__':
     init()
-    ioloop.IOLoop.instance().start()
+    ioloop.IOLoop.current().start()

@@ -42,29 +42,6 @@ class WsHandler(tornado.websocket.WebSocketHandler):
         cls.routers.update(routers)
 
 
-class WechatyHandler(WsHandler):
-    waiters = set([])
-    routers = {}
-
-    @gen.coroutine
-    def on_message(self, message):
-        logging.info("got message %r", message)
-        message_json = tool.json_load(message)
-
-        res_data = None
-        try:
-            func = self.__class__.routers.get(message_json.get("type"))
-            if func:
-                result = yield func(self, message_json["data"])
-                res_data = {"type": "init", "desc": "success", "data": result}
-            else:
-                res_data = {"code": 404, "desc": "No message type %s " % message_json.get("type"), "data": message}
-        except Exception as e:
-            res_data = {"code": 500, "desc": str(e), "data": None}
-
-        self.write_message(res_data)
-
-
 class ServerHandler(WsHandler):
     waiters = set([])
     routers = {}

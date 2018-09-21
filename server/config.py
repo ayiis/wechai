@@ -16,5 +16,6 @@ MONGODB = {
 }
 
 API = {
-    "send_any_message": "http://127.0.0.1:8081/api/send_any_message"
+    "ws_server": "http://127.0.0.1:8081/ws_server",
+    # "send_any_message": "http://127.0.0.1:8081/api/send_any_message",
 }

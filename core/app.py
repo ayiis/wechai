@@ -1,57 +1,47 @@
 #!/usr/bin/env python2.7
 # -*- coding: utf-8 -*-
 
-# 解决uft-8中文序列化报错的问题
 import sys
-reload(sys).setdefaultencoding("utf-8")
 
 import tornado
-from tornado import websocket, ioloop, gen
-from tornado import web
+from tornado import ioloop, gen
+import tornado.web
 import traceback
 
-from common import tool, my_mongodb
+from common import my_mongodb
 
 from routes import main
-from routes.api import recv_any_message
 import config
+
+from routes import ws_handler
+from db import (
+    concat,
+    concat_message,
+    room,
+    room_message
+)
 
 # url = "ws://127.0.0.1:8888/ws"
 url = "ws://127.0.0.1:3000/"
-
-
-@gen.coroutine
-def start_web(ws_handler, mongodbs):
-
-    from routes import router
-    try:
-
-        router.add_post_url_handlers({
-            "/api/recv_any_message": recv_any_message.do,
-            "/api/send_any_message": recv_any_message.do,
-        })
-        settings = {
-            "debug": True,
-            "ws": ws_handler,
-            "db_wechai": mongodbs["db_wechai"],
-        }
-
-        tornado.web.Application([
-            (r"/.*", router.DefaultRouterHandler),  # 默认处理方法，其他处理方法需在此方法之前声明
-        ], **settings).listen(8081)
-
-    except Exception as e:
-        print traceback.format_exc()
-        raise
-
-
-from routes import ws_handler
+# 解决uft-8中文序列化报错的问题
+reload(sys).setdefaultencoding("utf-8")
 
 
 @gen.coroutine
 def init():
 
     mongodbs = yield my_mongodb.init(config.MONGODB)
+
+    routes = {
+        "init": lambda self, data: {},
+        "concat.concat_list_query": concat.concat_list_query,
+        "concat_message.concat_message_list_query": concat_message.concat_message_list_query,
+        "room.room_list_query": room.room_list_query,
+        "room_message.room_message_list_query": room_message.room_message_list_query,
+    }
+    # ws_handler.WechatyHandler.define_route(routes)
+
+    ws_handler.ServerHandler.define_route(routes)
 
     settings = {
         "debug": True,
@@ -60,18 +50,21 @@ def init():
     }
 
     tornado.web.Application([
-        (r"/concat", ws_handler.WsHandler),
+        (r"/ws_wechaty", ws_handler.WechatyHandler),
+        (r"/ws_server", ws_handler.ServerHandler),
     ], **settings).listen(config.SYSTEM["listening_port"])
 
     print "ws Listen:", config.SYSTEM["listening_port"]
 
+    yield init2(mongodbs)
+
 
 @gen.coroutine
-def init0():
+def init2(mongodbs):
+
+    url = "ws://127.0.0.1:3000/"
 
     try:
-        mongodbs = yield my_mongodb.init(config.MONGODB)
-
         conf = {
             "url": url,
             "db_wechai": mongodbs["db_wechai"],
